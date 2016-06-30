@@ -1,0 +1,123 @@
+<!DOCTYPE html>
+<!DOCTYPE html>
+<html>
+<head>
+	<script src="https://code.jquery.com/jquery.min.js"></script>
+	<script src="https://code.jquery.com/ui/1.11.4/jquery-ui.min.js"></script>
+	<link href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.4/css/bootstrap.min.css" rel="stylesheet" type="text/css" />
+	<script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.4/js/bootstrap.min.js"></script>
+	<script src="https://fb.me/react-0.13.3.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/react/0.14.0-alpha1/JSXTransformer.js"></script>
+
+	<title>Razan's React TODO</title>
+</head>
+<body>
+	<div id="react-container"></div>
+	<script type="text/jsx">
+		var Note = React.createClass({
+			getInitialState: function(){
+				return {editing: false}
+			},
+			edit: function(){
+				this.setState({editing: true});
+			},
+			save: function(){
+				this.props.onChange(this.refs.newText.getDOMNode().value, this.props.index);
+				this.setState({editing: false});
+			},
+			remove: function(){
+        this.props.onRemove(this.props.index); 
+			},
+			renderDisplay: function(){
+				return (
+					<div className = "note">
+						<span>
+							<button onClick={this.edit} className="btn btn-primary glyphicon glyphicon-pencil"/>
+							<button onClick={this.remove} className="btn btn-danger glyphicon glyphicon-trash"/>
+						</span>
+						<p>{this.props.children}</p>
+					</div>
+				);
+			},
+			renderForm: function(){
+				return (
+					<div className="note">
+						<textarea ref="newText" defaultValue={this.props.children} className="form-control"></textarea>
+						<button onClick={this.save} className="btn btn-success btn-sm glyphicon glyphicon-floppy-disk"/>
+					</div>
+				)
+			},
+			render: function(){
+				if (this.state.editing){
+					return this.renderForm();
+				}
+				else {
+					return this.renderDisplay();
+				}
+			}
+		});
+
+		var Board = React.createClass({
+			propTypes: {
+				count: function(props, propName){
+					if (typeof props[propName] !== "number"){
+						return new Error('blah blah..');
+					}
+				}
+			},
+			getInitialState: function(){
+				return {
+					notes:	[
+						'Call Rojesh',
+						'Do the Dishes',
+						'Clean the room'
+					]
+				};
+			},
+			update: function(newText, i){
+				var arr = this.state.notes;
+				arr[i] = newText;
+				this.setState({notes:arr});
+			},
+			remove: function(i){
+				debugger;
+				if(confirm('Delete the item?')) {
+					var arr = this.state.notes;
+					arr.splice(i, 1);
+					this.setState({notes:arr});
+				}
+			},
+			eachNote: function(note, i){
+				return (
+					<Note key={i} index={i} onChange={this.update} onRemove={this.remove}>{note}</Note>
+				);
+			},
+			render: function(){
+				return(
+					<div className="board">
+						{this.state.notes.map(this.eachNote)};
+					</div>
+				)
+			}
+		});
+		React.render(<Board count={10}/>, document.getElementById('react-container'));
+	</script>
+</body>
+
+
+<style type="text/css">
+	.note {
+		width: 200px;
+		height: 200px;
+		background-color: yellow;
+		position: relative;
+    top: 15px;
+		margin: 0 auto;
+		border-radius: 5px;
+    box-shadow: 0 0 8px 0 rgba(0, 0, 0, 0.19), 0 1px 0 0 rgba(0, 0, 0, 0.02);
+	}
+	.note p{
+		font-family: Lucida Grande;
+		font-size: medium;
+	}
+</style>
